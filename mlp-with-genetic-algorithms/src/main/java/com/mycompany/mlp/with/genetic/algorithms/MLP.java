@@ -6,6 +6,7 @@ package com.mycompany.mlp.with.genetic.algorithms;
  */
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class MLP {
     private final ArrayList<ArrayList<Double>> _patterns;
@@ -30,13 +31,29 @@ public class MLP {
         System.out.println("Dimension: " + this._dimension);
         System.out.println("Nodes: " + this._nodes);
     }
+   
+    private void initializeRandomWeights(Integer countOfWeightsDimension) {
+        for (int i = 0; i < countOfWeightsDimension; i++) {
+            Random r = new Random();
+            double min = -1;
+            double max = 1;
+            
+             Double randomValue = min + (max - min) * r.nextDouble();
+             this._weights.add(randomValue);
+        }
+    }
 
-    public void initializeWeights() {
+    public void initializeWeights(Boolean geneticOption) {
         int countOfWeightsDimension = (this._dimension + 2) * this._nodes;
         System.out.println("Count of weights: " + countOfWeightsDimension);
 
-        GeneticAlgorithm ga = new GeneticAlgorithm(countOfWeightsDimension);
-        this._weights = ga.getBestChromosome();
+        if (geneticOption) {
+            GeneticAlgorithm ga = new GeneticAlgorithm(countOfWeightsDimension);
+            this._weights = ga.getBestChromosome();
+        }
+        else {
+            this.initializeRandomWeights(countOfWeightsDimension);
+        }
     }
 
     private void findUniqueClasses() {
@@ -135,8 +152,8 @@ public class MLP {
         return deriv;
     }
 
-    public double train() {
-        this.initializeWeights();
+    public double train(Boolean geneticOption) {
+        this.initializeWeights(geneticOption);
         this.findUniqueClasses();
 
         double trainError = -1;
