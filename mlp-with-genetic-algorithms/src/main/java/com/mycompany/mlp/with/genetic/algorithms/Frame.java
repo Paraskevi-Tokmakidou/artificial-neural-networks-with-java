@@ -89,6 +89,7 @@ public class Frame extends JFrame {
     }
 
     // Action depending on the user's choice from the menu
+    @SuppressWarnings("deprecation")
     @Override
     public boolean action(Event event, Object obj) {
         if (event.target instanceof MenuItem) {

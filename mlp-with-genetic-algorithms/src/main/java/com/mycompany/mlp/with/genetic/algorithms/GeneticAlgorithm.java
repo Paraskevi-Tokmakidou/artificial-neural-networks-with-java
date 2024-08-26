@@ -9,6 +9,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+enum CROSSOVEROPTIONS {
+    SINGLE,
+    DOUBLE
+}
+
 public class GeneticAlgorithm {
     private ArrayList<ArrayList<Double>> _population;
     private ArrayList<ArrayList<Double>> _newPopulation;
@@ -19,12 +24,16 @@ public class GeneticAlgorithm {
     private final int _countOfPopulation;
     private final int _maxEpochs;
     private final double _elitismRatio;
+    private final double _mutationRatio;
     private final int _elitismCountOfChromosomesThatPassToNextEpoch;
+    private final boolean _wantToDisplayTrainErrorInEachEpoch;
+    private final CROSSOVEROPTIONS _crossoverOption;
 
     GeneticAlgorithm(int dimension) {
         this._countOfPopulation = 200;
         this._maxEpochs = 300;
-        this._elitismRatio = 0.05; // 5 %
+        this._elitismRatio = 0.05; // 5%
+        this._mutationRatio = 0.07; // 7%
         this._elitismCountOfChromosomesThatPassToNextEpoch = (int) Math
                 .round(this._countOfPopulation * this._elitismRatio);
         this._countGenesOfChromosome = dimension;
@@ -32,6 +41,8 @@ public class GeneticAlgorithm {
         this._dimensionPatterns = Data.getDimension();
         this._nodes = Data.getNodes();
         this._population = new ArrayList<>();
+        this._wantToDisplayTrainErrorInEachEpoch = false;
+        this._crossoverOption = CROSSOVEROPTIONS.DOUBLE;
     }
 
     private void randomInitializationGenes() {
@@ -136,9 +147,11 @@ public class GeneticAlgorithm {
         for (int i = 0; i < randomGenePosition; i++) {
             child1.add(tempChromosomes.get(0).get(i));
         }
+
         for (int i = randomGenePosition; i < this._countGenesOfChromosome; i++) {
             child1.add(tempChromosomes.get(1).get(i));
         }
+
         for (int i = 0; i < 3; i++) {
             child1.add(-1.0);
         }
@@ -153,9 +166,11 @@ public class GeneticAlgorithm {
         for (int i = 0; i < randomGenePosition; i++) {
             child1.add(selectedChromosomes.get(0).get(i));
         }
+
         for (int i = randomGenePosition; i < secondRandomGenePosition; i++) {
             child1.add(selectedChromosomes.get(1).get(i));
         }
+
         for (int i = secondRandomGenePosition; i < this._countGenesOfChromosome; i++) {
             child1.add(selectedChromosomes.get(0).get(i));
         }
@@ -193,7 +208,11 @@ public class GeneticAlgorithm {
                 secondRandomGenePosition = temp;
             }
 
-            this.doublePointCrossover(tempChromosomes, randomGenePosition, secondRandomGenePosition);
+            if (this._crossoverOption == CROSSOVEROPTIONS.SINGLE) {
+                this.singlePointCrossover(tempChromosomes);
+            } else {
+                this.doublePointCrossover(tempChromosomes, randomGenePosition, secondRandomGenePosition);
+            }
         }
     }
 
@@ -202,7 +221,7 @@ public class GeneticAlgorithm {
             ArrayList<Double> tempChromosome = new ArrayList<>();
             for (int j = 0; j < this._newPopulation.get(i).size(); j++) {
                 double probability_of_mutation = Math.random();
-                if (probability_of_mutation <= 0.07) {
+                if (probability_of_mutation <= this._mutationRatio) {
                     tempChromosome.add(this._newPopulation.get(i).get(j)
                             + this._newPopulation.get(i).get(j) * probability_of_mutation);
                 } else {
@@ -242,14 +261,16 @@ public class GeneticAlgorithm {
 
             this.fitnessFunctions();
 
-            // this.displayTrainError(i);
+            if (this._wantToDisplayTrainErrorInEachEpoch) {
+                this.displayTrainError(i);
+            }
         }
 
         return this._population.get(this._population.size() - 1);
     }
 
     private void displayTrainError(int i) {
-        System.out.println("i[" + i + "] = "
+        System.out.println("Genetic Train Error: i[" + i + "] = "
                 + this._population.get(this._population.size() - 1).get(this._countGenesOfChromosome));
     }
 }

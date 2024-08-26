@@ -17,6 +17,7 @@ public class MLP {
     private final int _dimension;
     private final double _learningRate;
     private final int _maxEpoches;
+    private final boolean _wantToDisplayTrainErrorInEachEpoch;
 
     MLP() {
         this._patterns = Data.getTrainPatterns();
@@ -26,20 +27,21 @@ public class MLP {
         this._weights = new ArrayList<>();
         this._learningRate = Data.getLearning_rate();
         this._maxEpoches = Data.getMax_epoches();
+        this._wantToDisplayTrainErrorInEachEpoch = false;
 
         System.out.println("Count of patterns: " + this._count);
         System.out.println("Dimension: " + this._dimension);
         System.out.println("Nodes: " + this._nodes);
     }
-   
+
     private void initializeRandomWeights(Integer countOfWeightsDimension) {
         for (int i = 0; i < countOfWeightsDimension; i++) {
             Random r = new Random();
             double min = -1;
             double max = 1;
-            
-             Double randomValue = min + (max - min) * r.nextDouble();
-             this._weights.add(randomValue);
+
+            Double randomValue = min + (max - min) * r.nextDouble();
+            this._weights.add(randomValue);
         }
     }
 
@@ -50,8 +52,7 @@ public class MLP {
         if (geneticOption) {
             GeneticAlgorithm ga = new GeneticAlgorithm(countOfWeightsDimension);
             this._weights = ga.getBestChromosome();
-        }
-        else {
+        } else {
             this.initializeRandomWeights(countOfWeightsDimension);
         }
     }
@@ -169,7 +170,9 @@ public class MLP {
                 }
             }
 
-            // this.displayTrainError(i, trainError);
+            if (this._wantToDisplayTrainErrorInEachEpoch) {
+                this.displayTrainError(i, trainError);
+            }
         }
 
         if (trainError > -1) {
@@ -192,6 +195,6 @@ public class MLP {
     }
 
     private void displayTrainError(int i, double trainError) {
-        System.out.println("Train error: (" + i + ") = " + trainError);
+        System.out.println("MLP Train Error: i[" + i + "] = " + trainError);
     }
 }
