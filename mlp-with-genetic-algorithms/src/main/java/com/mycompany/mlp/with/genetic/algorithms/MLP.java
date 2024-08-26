@@ -45,12 +45,12 @@ public class MLP {
         }
     }
 
-    public void initializeWeights(Boolean geneticOption) {
+    public void initializeWeights(Boolean geneticOption, GENETIC_CROSSOVER_OPTIONS geneticCrossoverOption) {
         int countOfWeightsDimension = (this._dimension + 2) * this._nodes;
         System.out.println("Count of weights: " + countOfWeightsDimension);
 
         if (geneticOption) {
-            GeneticAlgorithm ga = new GeneticAlgorithm(countOfWeightsDimension);
+            GeneticAlgorithm ga = new GeneticAlgorithm(countOfWeightsDimension, geneticCrossoverOption);
             this._weights = ga.getBestChromosome();
         } else {
             this.initializeRandomWeights(countOfWeightsDimension);
@@ -153,8 +153,8 @@ public class MLP {
         return deriv;
     }
 
-    public double train(Boolean geneticOption) {
-        this.initializeWeights(geneticOption);
+    public double train(Boolean geneticOption, GENETIC_CROSSOVER_OPTIONS geneticCrossoverOption) {
+        this.initializeWeights(geneticOption, geneticCrossoverOption);
         this.findUniqueClasses();
 
         double trainError = -1;

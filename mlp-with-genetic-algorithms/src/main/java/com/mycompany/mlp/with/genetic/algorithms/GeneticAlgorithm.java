@@ -9,11 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
-enum CROSSOVEROPTIONS {
-    SINGLE,
-    DOUBLE
-}
-
 public class GeneticAlgorithm {
     private ArrayList<ArrayList<Double>> _population;
     private ArrayList<ArrayList<Double>> _newPopulation;
@@ -27,9 +22,9 @@ public class GeneticAlgorithm {
     private final double _mutationRatio;
     private final int _elitismCountOfChromosomesThatPassToNextEpoch;
     private final boolean _wantToDisplayTrainErrorInEachEpoch;
-    private final CROSSOVEROPTIONS _crossoverOption;
+    private final GENETIC_CROSSOVER_OPTIONS _crossoverOption;
 
-    GeneticAlgorithm(int dimension) {
+    GeneticAlgorithm(int dimension, GENETIC_CROSSOVER_OPTIONS geneticCrossoverOption) {
         this._countOfPopulation = 200;
         this._maxEpochs = 300;
         this._elitismRatio = 0.05; // 5%
@@ -42,7 +37,7 @@ public class GeneticAlgorithm {
         this._nodes = Data.getNodes();
         this._population = new ArrayList<>();
         this._wantToDisplayTrainErrorInEachEpoch = false;
-        this._crossoverOption = CROSSOVEROPTIONS.DOUBLE;
+        this._crossoverOption = geneticCrossoverOption;
     }
 
     private void randomInitializationGenes() {
@@ -162,7 +157,6 @@ public class GeneticAlgorithm {
     private void doublePointCrossover(ArrayList<ArrayList<Double>> selectedChromosomes, int randomGenePosition,
             int secondRandomGenePosition) {
         ArrayList<Double> child1 = new ArrayList<>();
-
         for (int i = 0; i < randomGenePosition; i++) {
             child1.add(selectedChromosomes.get(0).get(i));
         }
@@ -208,7 +202,7 @@ public class GeneticAlgorithm {
                 secondRandomGenePosition = temp;
             }
 
-            if (this._crossoverOption == CROSSOVEROPTIONS.SINGLE) {
+            if (this._crossoverOption == GENETIC_CROSSOVER_OPTIONS.SINGLE) {
                 this.singlePointCrossover(tempChromosomes);
             } else {
                 this.doublePointCrossover(tempChromosomes, randomGenePosition, secondRandomGenePosition);

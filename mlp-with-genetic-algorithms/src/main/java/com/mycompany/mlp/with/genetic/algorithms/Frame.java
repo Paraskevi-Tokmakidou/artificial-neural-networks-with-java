@@ -70,9 +70,12 @@ public class Frame extends JFrame {
         menuBar.add(datasetMenu);
 
         algorithmsMenu = new Menu("NETWORKS-ALGORITHMS");
-        algorithmsItems = new MenuItem[2];
+        algorithmsItems = new MenuItem[3];
         algorithmsItems[0] = new MenuItem("MLP with Back Propagation");
-        algorithmsItems[1] = new MenuItem("MLP with Back Propagation (Using Genetic Algorithm)");
+        algorithmsItems[1] = new MenuItem(
+                "MLP with Back Propagation (Using Genetic Algorithm) - Single point crossover");
+        algorithmsItems[2] = new MenuItem(
+                "MLP with Back Propagation (Using Genetic Algorithm) - Double point crossover");
         for (short i = 0; i < algorithmsItems.length; i++)
             algorithmsMenu.add(algorithmsItems[i]);
         menuBar.add(algorithmsMenu);
@@ -166,7 +169,7 @@ public class Frame extends JFrame {
                     else {
                         this.setTextLabel(this.WAIT_TRAINING);
                         MLP mlp = new MLP();
-                        Double trainError = mlp.train(false);
+                        Double trainError = mlp.train(false, null);
                         Double testError = mlp.getTestError();
                         String testErrorDisplay = (testError == -1.0) ? "No test dataset" : testError.toString();
                         this.setTextLabel(
@@ -196,13 +199,49 @@ public class Frame extends JFrame {
                     }
                     break;
                 }
-                case "MLP with Back Propagation (Using Genetic Algorithm)" -> {
+                case "MLP with Back Propagation (Using Genetic Algorithm) - Single point crossover" -> {
                     if (!loadedDatasets)
                         this.setTextLabel(this.NEED_DATASETS);
                     else {
                         this.setTextLabel(this.WAIT_TRAINING);
                         MLP mlp = new MLP();
-                        Double trainError = mlp.train(true);
+                        Double trainError = mlp.train(true, GENETIC_CROSSOVER_OPTIONS.SINGLE);
+                        Double testError = mlp.getTestError();
+                        String testErrorDisplay = (testError == -1.0) ? "No test dataset" : testError.toString();
+                        this.setTextLabel(
+                                "<html>"
+                                        + "<h2>"
+                                        + "<br/><br/><br/><br/><br/>"
+                                        + "<table style='font: 16px Arial, Helvetica, sans-serif;;'>"
+                                        + "<tr>"
+                                        + "<td>"
+                                        + " Train Error: "
+                                        + "</td>"
+                                        + "<td>"
+                                        + trainError
+                                        + "<td/>"
+                                        + "<tr/>"
+                                        + "<tr>"
+                                        + "<td>"
+                                        + " Test Error: "
+                                        + "</td>"
+                                        + "<td>"
+                                        + testErrorDisplay
+                                        + "<td/>"
+                                        + "<tr/>"
+                                        + "</table>"
+                                        + "</h2>"
+                                        + "</html>");
+                    }
+                    break;
+                }
+                case "MLP with Back Propagation (Using Genetic Algorithm) - Double point crossover" -> {
+                    if (!loadedDatasets)
+                        this.setTextLabel(this.NEED_DATASETS);
+                    else {
+                        this.setTextLabel(this.WAIT_TRAINING);
+                        MLP mlp = new MLP();
+                        Double trainError = mlp.train(true, GENETIC_CROSSOVER_OPTIONS.DOUBLE);
                         Double testError = mlp.getTestError();
                         String testErrorDisplay = (testError == -1.0) ? "No test dataset" : testError.toString();
                         this.setTextLabel(
