@@ -196,18 +196,21 @@ public class GeneticAlgorithm {
 
     private void mutation() {
         for (int i = this._elitismCountOfChromosomesThatPassToNextEpoch; i < this._newPopulation.size(); i++) {
-            ArrayList<Double> tempChromosome = new ArrayList<>();
-            for (int j = 0; j < this._newPopulation.get(i).size(); j++) {
-                double probability_of_mutation = Math.random();
-                if (probability_of_mutation <= this._mutationRatio) {
-                    tempChromosome.add(this._newPopulation.get(i).get(j)
-                            + this._newPopulation.get(i).get(j) * probability_of_mutation);
-                } else {
-                    tempChromosome.add(this._newPopulation.get(i).get(j));
+            ArrayList<Double> mutatedChromosome = new ArrayList<>();
+            ArrayList<Double> currentChromosome = this._newPopulation.get(i);
+
+            for (int j = 0; j < currentChromosome.size(); j++) {
+                double mutationProbability = Math.random();
+                double gene = currentChromosome.get(j);
+
+                if (mutationProbability <= this._mutationRatio) {
+                    gene += gene * mutationProbability;
                 }
+
+                mutatedChromosome.add(gene);
             }
 
-            this._newPopulation.set(i, tempChromosome);
+            this._newPopulation.set(i, mutatedChromosome);
         }
     }
 
