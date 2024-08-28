@@ -23,8 +23,10 @@ public class GeneticAlgorithm {
     private final int _elitismCountOfChromosomesThatPassToNextEpoch;
     private final boolean _wantToDisplayTrainErrorInEachEpoch;
     private final GENETIC_CROSSOVER_OPTIONS _crossoverOption;
+    private Random random;
 
     GeneticAlgorithm(int dimension, GENETIC_CROSSOVER_OPTIONS geneticCrossoverOption) {
+        this.random = new Random();
         this._countOfPopulation = 200;
         this._maxEpochs = 300;
         this._elitismRatio = 0.05; // 5%
@@ -41,20 +43,17 @@ public class GeneticAlgorithm {
     }
 
     private void randomInitializationGenes() {
-        for (int i = 0; i < this._countOfPopulation; i++) {
-            Random r = new Random();
-            double min = -1;
-            double max = 1;
+        double min = -1;
+        double max = 1;
 
+        for (int i = 0; i < this._countOfPopulation; i++) {
             ArrayList<Double> tempChromosome = new ArrayList<>();
             for (int j = 0; j < this._countGenesOfChromosome; j++) {
-                Double randomValue = min + (max - min) * r.nextDouble();
+                Double randomValue = min + (max - min) * this.random.nextDouble();
                 tempChromosome.add(randomValue);
             }
 
-            for (int j = 0; j < 3; j++) {
-                tempChromosome.add(-999.999); // Default values for future usage
-            }
+            tempChromosome.addAll(Collections.nCopies(3, -999.999)); // Default values for future usage
 
             this._population.add(tempChromosome);
         }
@@ -131,49 +130,52 @@ public class GeneticAlgorithm {
         }
     }
 
-    private void singlePointCrossover(ArrayList<ArrayList<Double>> tempChromosomes) {
-        Random r = new Random();
-        int min = 1;
-        int max = this._countGenesOfChromosome;
-        int randomGenePosition = r.nextInt((max - min) + 1) + min;
+    private void crossover(ArrayList<Double> parent1, ArrayList<Double> parent2) {
+        // 0 - count genes Of chromosome
+        int randomGenePosition = this.random.nextInt(this._countGenesOfChromosome - 1) + 1;
 
-        ArrayList<Double> child1 = new ArrayList<>();
+        int secondRandomGenePosition;
+        do {
+            // 0 - count genes Of chromosome
+            secondRandomGenePosition = this.random.nextInt(this._countGenesOfChromosome - 1) + 1;
+        } while (secondRandomGenePosition == randomGenePosition);
 
-        for (int i = 0; i < randomGenePosition; i++) {
-            child1.add(tempChromosomes.get(0).get(i));
+        if (secondRandomGenePosition < randomGenePosition) {
+            int temp = randomGenePosition;
+            randomGenePosition = secondRandomGenePosition;
+            secondRandomGenePosition = temp;
         }
 
-        for (int i = randomGenePosition; i < this._countGenesOfChromosome; i++) {
-            child1.add(tempChromosomes.get(1).get(i));
+        if (this._crossoverOption == GENETIC_CROSSOVER_OPTIONS.SINGLE) {
+            this.singlePointCrossover(parent1, parent2, randomGenePosition);
+        } else {
+            this.doublePointCrossover(parent1, parent2, randomGenePosition, secondRandomGenePosition);
         }
-
-        for (int i = 0; i < 3; i++) {
-            child1.add(-1.0);
-        }
-
-        this._newPopulation.add(child1);
     }
 
-    private void doublePointCrossover(ArrayList<ArrayList<Double>> selectedChromosomes, int randomGenePosition,
+    private void singlePointCrossover(ArrayList<Double> parent1, ArrayList<Double> parent2, int randomGenePosition) {
+        ArrayList<Double> child = new ArrayList<>();
+        // 0 - randomGenePosition
+        child.addAll(parent1.subList(0, randomGenePosition));
+        // randomGenePosition - end
+        child.addAll(parent2.subList(randomGenePosition, this._countGenesOfChromosome));
+        child.addAll(Collections.nCopies(3, -1.0));
+
+        this._newPopulation.add(child);
+    }
+
+    private void doublePointCrossover(ArrayList<Double> parent1, ArrayList<Double> parent2, int randomGenePosition,
             int secondRandomGenePosition) {
-        ArrayList<Double> child1 = new ArrayList<>();
-        for (int i = 0; i < randomGenePosition; i++) {
-            child1.add(selectedChromosomes.get(0).get(i));
-        }
+        ArrayList<Double> child = new ArrayList<>();
+        // 0 - randomGenePosition
+        child.addAll(parent1.subList(0, randomGenePosition));
+        // randomGenePosition - secondRandomGenePosition
+        child.addAll(parent2.subList(randomGenePosition, secondRandomGenePosition));
+        // secondRandomGenePosition - end
+        child.addAll(parent1.subList(secondRandomGenePosition, this._countGenesOfChromosome));
+        child.addAll(Collections.nCopies(3, -1.0));
 
-        for (int i = randomGenePosition; i < secondRandomGenePosition; i++) {
-            child1.add(selectedChromosomes.get(1).get(i));
-        }
-
-        for (int i = secondRandomGenePosition; i < this._countGenesOfChromosome; i++) {
-            child1.add(selectedChromosomes.get(0).get(i));
-        }
-
-        for (int i = 0; i < 3; i++) {
-            child1.add(-1.0);
-        }
-
-        this._newPopulation.add(child1);
+        this._newPopulation.add(child);
     }
 
     private void rouletteWheel() {
@@ -186,44 +188,27 @@ public class GeneticAlgorithm {
                 tempChromosomes.add(this._population.get(ramdomParentIndex));
             }
 
-            Random r = new Random();
-            int min = 1;
-            int max = this._countGenesOfChromosome;
-            int randomGenePosition = r.nextInt((max - min) + 1) + min;
-
-            int secondRandomGenePosition;
-            do {
-                secondRandomGenePosition = r.nextInt((max - min) + 1) + min;
-            } while (secondRandomGenePosition == randomGenePosition);
-
-            if (secondRandomGenePosition < randomGenePosition) {
-                int temp = randomGenePosition;
-                randomGenePosition = secondRandomGenePosition;
-                secondRandomGenePosition = temp;
-            }
-
-            if (this._crossoverOption == GENETIC_CROSSOVER_OPTIONS.SINGLE) {
-                this.singlePointCrossover(tempChromosomes);
-            } else {
-                this.doublePointCrossover(tempChromosomes, randomGenePosition, secondRandomGenePosition);
-            }
+            this.crossover(tempChromosomes.get(0), tempChromosomes.get(1));
         }
     }
 
     private void mutation() {
         for (int i = this._elitismCountOfChromosomesThatPassToNextEpoch; i < this._newPopulation.size(); i++) {
-            ArrayList<Double> tempChromosome = new ArrayList<>();
-            for (int j = 0; j < this._newPopulation.get(i).size(); j++) {
-                double probability_of_mutation = Math.random();
-                if (probability_of_mutation <= this._mutationRatio) {
-                    tempChromosome.add(this._newPopulation.get(i).get(j)
-                            + this._newPopulation.get(i).get(j) * probability_of_mutation);
-                } else {
-                    tempChromosome.add(this._newPopulation.get(i).get(j));
+            ArrayList<Double> mutatedChromosome = new ArrayList<>();
+            ArrayList<Double> currentChromosome = this._newPopulation.get(i);
+
+            for (int j = 0; j < currentChromosome.size(); j++) {
+                double mutationProbability = Math.random();
+                double gene = currentChromosome.get(j);
+
+                if (mutationProbability <= this._mutationRatio) {
+                    gene += gene * mutationProbability;
                 }
+
+                mutatedChromosome.add(gene);
             }
 
-            this._newPopulation.set(i, tempChromosome);
+            this._newPopulation.set(i, mutatedChromosome);
         }
     }
 
