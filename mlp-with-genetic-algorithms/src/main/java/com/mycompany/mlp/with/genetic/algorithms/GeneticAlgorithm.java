@@ -18,6 +18,7 @@ public class GeneticAlgorithm {
     private final int _countGenesOfChromosome;
     private final int _countOfPopulation;
     private final int _maxEpochs;
+    private final double _crossoverRatio;
     private final double _elitismRatio;
     private final double _mutationRatio;
     private final int _elitismCountOfChromosomesThatPassToNextEpoch;
@@ -29,8 +30,9 @@ public class GeneticAlgorithm {
         this.random = new Random();
         this._countOfPopulation = 200;
         this._maxEpochs = 300;
+        this._crossoverRatio = 0.95; // 95%
         this._elitismRatio = 0.05; // 5%
-        this._mutationRatio = 0.07; // 7%
+        this._mutationRatio = 0.02; // 2%
         this._elitismCountOfChromosomesThatPassToNextEpoch = (int) Math
                 .round(this._countOfPopulation * this._elitismRatio);
         this._countGenesOfChromosome = dimension;
@@ -107,8 +109,8 @@ public class GeneticAlgorithm {
     }
 
     private void sortPopulationByFitnessValue() {
-        Collections.sort(this._population, Collections.reverseOrder(
-                (a, b) -> Double.compare(a.get(this._countGenesOfChromosome), b.get(this._countGenesOfChromosome))));
+        Collections.sort(this._population,
+                (a, b) -> Double.compare(a.get(this._countGenesOfChromosome), b.get(this._countGenesOfChromosome)));
     }
 
     private void calculateCumulativeSumOfNormalizedFitnessValues() {
@@ -124,8 +126,7 @@ public class GeneticAlgorithm {
     }
 
     private void elitism() {
-        for (int i = this._population.size() - 1; i >= this._population.size()
-                - this._elitismCountOfChromosomesThatPassToNextEpoch; i--) {
+        for (int i = 0; i < this._elitismCountOfChromosomesThatPassToNextEpoch; i++) {
             this._newPopulation.add(this._population.get(i));
         }
     }
@@ -188,7 +189,12 @@ public class GeneticAlgorithm {
                 tempChromosomes.add(this._population.get(ramdomParentIndex));
             }
 
-            this.crossover(tempChromosomes.get(0), tempChromosomes.get(1));
+            double crossoverProbability = this.random.nextDouble();
+            if (crossoverProbability <= this._crossoverRatio) {
+                this.crossover(tempChromosomes.get(0), tempChromosomes.get(1));
+            } else {
+                this._newPopulation.add(tempChromosomes.get(0));
+            }
         }
     }
 
@@ -250,6 +256,6 @@ public class GeneticAlgorithm {
 
     private void displayTrainError(int i) {
         System.out.println("Genetic Train Error: i[" + i + "] = "
-                + this._population.get(this._population.size() - 1).get(this._countGenesOfChromosome));
+                + this._population.get(0).get(this._countGenesOfChromosome));
     }
 }
