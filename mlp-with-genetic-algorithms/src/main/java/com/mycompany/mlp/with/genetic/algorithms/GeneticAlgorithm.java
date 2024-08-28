@@ -41,20 +41,18 @@ public class GeneticAlgorithm {
     }
 
     private void randomInitializationGenes() {
-        for (int i = 0; i < this._countOfPopulation; i++) {
-            Random r = new Random();
-            double min = -1;
-            double max = 1;
+        Random random = new Random();
+        double min = -1;
+        double max = 1;
 
+        for (int i = 0; i < this._countOfPopulation; i++) {
             ArrayList<Double> tempChromosome = new ArrayList<>();
             for (int j = 0; j < this._countGenesOfChromosome; j++) {
-                Double randomValue = min + (max - min) * r.nextDouble();
+                Double randomValue = min + (max - min) * random.nextDouble();
                 tempChromosome.add(randomValue);
             }
 
-            for (int j = 0; j < 3; j++) {
-                tempChromosome.add(-999.999); // Default values for future usage
-            }
+            tempChromosome.addAll(Collections.nCopies(3, -999.999)); // Default values for future usage
 
             this._population.add(tempChromosome);
         }
