@@ -23,8 +23,10 @@ public class GeneticAlgorithm {
     private final int _elitismCountOfChromosomesThatPassToNextEpoch;
     private final boolean _wantToDisplayTrainErrorInEachEpoch;
     private final GENETIC_CROSSOVER_OPTIONS _crossoverOption;
+    private Random random;
 
     GeneticAlgorithm(int dimension, GENETIC_CROSSOVER_OPTIONS geneticCrossoverOption) {
+        this.random = new Random();
         this._countOfPopulation = 200;
         this._maxEpochs = 300;
         this._elitismRatio = 0.05; // 5%
@@ -41,14 +43,13 @@ public class GeneticAlgorithm {
     }
 
     private void randomInitializationGenes() {
-        Random random = new Random();
         double min = -1;
         double max = 1;
 
         for (int i = 0; i < this._countOfPopulation; i++) {
             ArrayList<Double> tempChromosome = new ArrayList<>();
             for (int j = 0; j < this._countGenesOfChromosome; j++) {
-                Double randomValue = min + (max - min) * random.nextDouble();
+                Double randomValue = min + (max - min) * this.random.nextDouble();
                 tempChromosome.add(randomValue);
             }
 
@@ -130,14 +131,13 @@ public class GeneticAlgorithm {
     }
 
     private void crossover(ArrayList<Double> parent1, ArrayList<Double> parent2) {
-        Random random = new Random();
         // 0 - count genes Of chromosome
-        int randomGenePosition = random.nextInt(this._countGenesOfChromosome - 1) + 1;
+        int randomGenePosition = this.random.nextInt(this._countGenesOfChromosome - 1) + 1;
 
         int secondRandomGenePosition;
         do {
             // 0 - count genes Of chromosome
-            secondRandomGenePosition = random.nextInt(this._countGenesOfChromosome - 1) + 1;
+            secondRandomGenePosition = this.random.nextInt(this._countGenesOfChromosome - 1) + 1;
         } while (secondRandomGenePosition == randomGenePosition);
 
         if (secondRandomGenePosition < randomGenePosition) {
