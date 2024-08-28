@@ -18,6 +18,7 @@ public class GeneticAlgorithm {
     private final int _countGenesOfChromosome;
     private final int _countOfPopulation;
     private final int _maxEpochs;
+    private final double _crossoverRatio;
     private final double _elitismRatio;
     private final double _mutationRatio;
     private final int _elitismCountOfChromosomesThatPassToNextEpoch;
@@ -29,8 +30,9 @@ public class GeneticAlgorithm {
         this.random = new Random();
         this._countOfPopulation = 200;
         this._maxEpochs = 300;
+        this._crossoverRatio = 0.95; // 95%
         this._elitismRatio = 0.05; // 5%
-        this._mutationRatio = 0.07; // 7%
+        this._mutationRatio = 0.02; // 2%
         this._elitismCountOfChromosomesThatPassToNextEpoch = (int) Math
                 .round(this._countOfPopulation * this._elitismRatio);
         this._countGenesOfChromosome = dimension;
@@ -107,8 +109,8 @@ public class GeneticAlgorithm {
     }
 
     private void sortPopulationByFitnessValue() {
-        Collections.sort(this._population, Collections.reverseOrder(
-                (a, b) -> Double.compare(a.get(this._countGenesOfChromosome), b.get(this._countGenesOfChromosome))));
+        Collections.sort(this._population,
+                (a, b) -> Double.compare(a.get(this._countGenesOfChromosome), b.get(this._countGenesOfChromosome)));
     }
 
     private void calculateCumulativeSumOfNormalizedFitnessValues() {
@@ -124,8 +126,7 @@ public class GeneticAlgorithm {
     }
 
     private void elitism() {
-        for (int i = this._population.size() - 1; i >= this._population.size()
-                - this._elitismCountOfChromosomesThatPassToNextEpoch; i--) {
+        for (int i = 0; i < this._elitismCountOfChromosomesThatPassToNextEpoch; i++) {
             this._newPopulation.add(this._population.get(i));
         }
     }
@@ -160,7 +161,14 @@ public class GeneticAlgorithm {
         // randomGenePosition - end
         child.addAll(parent2.subList(randomGenePosition, this._countGenesOfChromosome));
         child.addAll(Collections.nCopies(3, -1.0));
+        this._newPopulation.add(child);
 
+        child = new ArrayList<>();
+        // 0 - randomGenePosition
+        child.addAll(parent2.subList(0, randomGenePosition));
+        // randomGenePosition - end
+        child.addAll(parent1.subList(randomGenePosition, this._countGenesOfChromosome));
+        child.addAll(Collections.nCopies(3, -1.0));
         this._newPopulation.add(child);
     }
 
@@ -174,12 +182,21 @@ public class GeneticAlgorithm {
         // secondRandomGenePosition - end
         child.addAll(parent1.subList(secondRandomGenePosition, this._countGenesOfChromosome));
         child.addAll(Collections.nCopies(3, -1.0));
+        this._newPopulation.add(child);
 
+        child = new ArrayList<>();
+        // 0 - randomGenePosition
+        child.addAll(parent2.subList(0, randomGenePosition));
+        // randomGenePosition - secondRandomGenePosition
+        child.addAll(parent1.subList(randomGenePosition, secondRandomGenePosition));
+        // secondRandomGenePosition - end
+        child.addAll(parent2.subList(secondRandomGenePosition, this._countGenesOfChromosome));
+        child.addAll(Collections.nCopies(3, -1.0));
         this._newPopulation.add(child);
     }
 
     private void rouletteWheel() {
-        while (this._newPopulation.size() != this._population.size()) {
+        while (this._newPopulation.size() < this._countOfPopulation) {
             // Take 2 parants and produce 1 child
             ArrayList<ArrayList<Double>> tempChromosomes = new ArrayList<>();
 
@@ -188,7 +205,12 @@ public class GeneticAlgorithm {
                 tempChromosomes.add(this._population.get(ramdomParentIndex));
             }
 
-            this.crossover(tempChromosomes.get(0), tempChromosomes.get(1));
+            double crossoverProbability = this.random.nextDouble();
+            if (crossoverProbability <= this._crossoverRatio) {
+                this.crossover(tempChromosomes.get(0), tempChromosomes.get(1));
+            } else {
+                this._newPopulation.add(tempChromosomes.get(0));
+            }
         }
     }
 
@@ -198,11 +220,14 @@ public class GeneticAlgorithm {
             ArrayList<Double> currentChromosome = this._newPopulation.get(i);
 
             for (int j = 0; j < currentChromosome.size(); j++) {
-                double mutationProbability = Math.random();
                 double gene = currentChromosome.get(j);
 
-                if (mutationProbability <= this._mutationRatio) {
-                    gene += gene * mutationProbability;
+                if (j < currentChromosome.size() - 3) {
+                    double mutationProbability = Math.random();
+
+                    if (mutationProbability <= this._mutationRatio) {
+                        gene += gene * mutationProbability;
+                    }
                 }
 
                 mutatedChromosome.add(gene);
@@ -250,6 +275,6 @@ public class GeneticAlgorithm {
 
     private void displayTrainError(int i) {
         System.out.println("Genetic Train Error: i[" + i + "] = "
-                + this._population.get(this._population.size() - 1).get(this._countGenesOfChromosome));
+                + this._population.get(0).get(this._countGenesOfChromosome));
     }
 }
