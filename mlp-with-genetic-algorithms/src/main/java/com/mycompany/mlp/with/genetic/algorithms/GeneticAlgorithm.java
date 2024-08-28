@@ -161,7 +161,14 @@ public class GeneticAlgorithm {
         // randomGenePosition - end
         child.addAll(parent2.subList(randomGenePosition, this._countGenesOfChromosome));
         child.addAll(Collections.nCopies(3, -1.0));
+        this._newPopulation.add(child);
 
+        child = new ArrayList<>();
+        // 0 - randomGenePosition
+        child.addAll(parent2.subList(0, randomGenePosition));
+        // randomGenePosition - end
+        child.addAll(parent1.subList(randomGenePosition, this._countGenesOfChromosome));
+        child.addAll(Collections.nCopies(3, -1.0));
         this._newPopulation.add(child);
     }
 
@@ -175,7 +182,16 @@ public class GeneticAlgorithm {
         // secondRandomGenePosition - end
         child.addAll(parent1.subList(secondRandomGenePosition, this._countGenesOfChromosome));
         child.addAll(Collections.nCopies(3, -1.0));
+        this._newPopulation.add(child);
 
+        child = new ArrayList<>();
+        // 0 - randomGenePosition
+        child.addAll(parent2.subList(0, randomGenePosition));
+        // randomGenePosition - secondRandomGenePosition
+        child.addAll(parent1.subList(randomGenePosition, secondRandomGenePosition));
+        // secondRandomGenePosition - end
+        child.addAll(parent2.subList(secondRandomGenePosition, this._countGenesOfChromosome));
+        child.addAll(Collections.nCopies(3, -1.0));
         this._newPopulation.add(child);
     }
 
