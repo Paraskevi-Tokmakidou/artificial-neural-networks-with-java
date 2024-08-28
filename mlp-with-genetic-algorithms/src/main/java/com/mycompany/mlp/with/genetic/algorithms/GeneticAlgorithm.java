@@ -204,11 +204,14 @@ public class GeneticAlgorithm {
             ArrayList<Double> currentChromosome = this._newPopulation.get(i);
 
             for (int j = 0; j < currentChromosome.size(); j++) {
-                double mutationProbability = Math.random();
                 double gene = currentChromosome.get(j);
 
-                if (mutationProbability <= this._mutationRatio) {
-                    gene += gene * mutationProbability;
+                if (j < currentChromosome.size() - 3) {
+                    double mutationProbability = Math.random();
+
+                    if (mutationProbability <= this._mutationRatio) {
+                        gene += gene * mutationProbability;
+                    }
                 }
 
                 mutatedChromosome.add(gene);
