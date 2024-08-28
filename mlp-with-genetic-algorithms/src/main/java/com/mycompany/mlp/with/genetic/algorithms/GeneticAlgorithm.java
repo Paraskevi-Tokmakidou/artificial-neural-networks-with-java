@@ -161,7 +161,14 @@ public class GeneticAlgorithm {
         // randomGenePosition - end
         child.addAll(parent2.subList(randomGenePosition, this._countGenesOfChromosome));
         child.addAll(Collections.nCopies(3, -1.0));
+        this._newPopulation.add(child);
 
+        child = new ArrayList<>();
+        // 0 - randomGenePosition
+        child.addAll(parent2.subList(0, randomGenePosition));
+        // randomGenePosition - end
+        child.addAll(parent1.subList(randomGenePosition, this._countGenesOfChromosome));
+        child.addAll(Collections.nCopies(3, -1.0));
         this._newPopulation.add(child);
     }
 
@@ -175,13 +182,21 @@ public class GeneticAlgorithm {
         // secondRandomGenePosition - end
         child.addAll(parent1.subList(secondRandomGenePosition, this._countGenesOfChromosome));
         child.addAll(Collections.nCopies(3, -1.0));
+        this._newPopulation.add(child);
 
+        child = new ArrayList<>();
+        // 0 - randomGenePosition
+        child.addAll(parent2.subList(0, randomGenePosition));
+        // randomGenePosition - secondRandomGenePosition
+        child.addAll(parent1.subList(randomGenePosition, secondRandomGenePosition));
+        // secondRandomGenePosition - end
+        child.addAll(parent2.subList(secondRandomGenePosition, this._countGenesOfChromosome));
+        child.addAll(Collections.nCopies(3, -1.0));
         this._newPopulation.add(child);
     }
 
     private void rouletteWheel() {
         while (this._newPopulation.size() < this._countOfPopulation) {
-            // Take 2 parants and produce 1 child
             ArrayList<ArrayList<Double>> tempChromosomes = new ArrayList<>();
 
             for (int i = 0; i < 2; i++) {
@@ -191,9 +206,11 @@ public class GeneticAlgorithm {
 
             double crossoverProbability = this.random.nextDouble();
             if (crossoverProbability <= this._crossoverRatio) {
+                // From 2 parants, produce 2 child
                 this.crossover(tempChromosomes.get(0), tempChromosomes.get(1));
             } else {
                 this._newPopulation.add(tempChromosomes.get(0));
+                this._newPopulation.add(tempChromosomes.get(1));
             }
         }
     }
