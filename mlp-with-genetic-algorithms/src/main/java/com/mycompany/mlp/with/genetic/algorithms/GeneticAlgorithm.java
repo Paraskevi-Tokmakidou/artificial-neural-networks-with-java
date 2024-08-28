@@ -179,7 +179,7 @@ public class GeneticAlgorithm {
     }
 
     private void rouletteWheel() {
-        while (this._newPopulation.size() != this._population.size()) {
+        while (this._newPopulation.size() < this._countOfPopulation) {
             // Take 2 parants and produce 1 child
             ArrayList<ArrayList<Double>> tempChromosomes = new ArrayList<>();
 
