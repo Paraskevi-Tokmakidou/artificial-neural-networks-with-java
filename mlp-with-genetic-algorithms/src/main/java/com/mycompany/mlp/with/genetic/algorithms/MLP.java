@@ -35,12 +35,12 @@ public class MLP {
     }
 
     private void initializeRandomWeights(Integer countOfWeightsDimension) {
-        for (int i = 0; i < countOfWeightsDimension; i++) {
-            Random r = new Random();
-            double min = -1;
-            double max = 1;
+        Random random = new Random();
+        double min = -1;
+        double max = 1;
 
-            Double randomValue = min + (max - min) * r.nextDouble();
+        for (int i = 0; i < countOfWeightsDimension; i++) {
+            Double randomValue = min + (max - min) * random.nextDouble();
             this._weights.add(randomValue);
         }
     }
@@ -98,7 +98,8 @@ public class MLP {
         double sum = 0.0;
 
         for (int i = 0; i < patterns.size(); i++) {
-            double yx = patterns.get(i).get(dimension); // The desired output
+            // The desired output
+            double yx = patterns.get(i).get(dimension);
             double ox = getOutput(patterns.get(i), nodes, dimension, weights);
             sum += (ox - yx) * (ox - yx);
         }
