@@ -45,6 +45,8 @@ public class GeneticAlgorithm {
     }
 
     private void randomInitializationGenes() {
+        this._population = new ArrayList<>();
+
         double min = -1;
         double max = 1;
 
@@ -97,8 +99,8 @@ public class GeneticAlgorithm {
     // by the total values of all fitnesses
     private void normalizeFitnessValues() {
         double sumFitnessValue = 0.0;
-        for (ArrayList<Double> chromosome : this._population) {
-            sumFitnessValue += chromosome.get(this._countGenesOfChromosome);
+        for (int k = 0; k < this._population.size(); k++) {
+            sumFitnessValue += this._population.get(k).get(this._countGenesOfChromosome);
         }
 
         for (int i = 0; i < this._population.size(); i++) {
@@ -200,11 +202,22 @@ public class GeneticAlgorithm {
             ArrayList<ArrayList<Double>> tempChromosomes = new ArrayList<>();
 
             for (int i = 0; i < 2; i++) {
-                int ramdomParentIndex = (int) ((Math.random() * (this._countOfPopulation - 0)) + 0);
-                tempChromosomes.add(this._population.get(ramdomParentIndex));
+                double randomCumulativeValue = Math.random();
+                boolean findParent = false;
+                for (int k = 1; k < this._population.size(); k++) {
+                    if (randomCumulativeValue > this._population.get(k).get(this._countGenesOfChromosome + 2)) {
+                        tempChromosomes.add(this._population.get(k - 1));
+                        findParent = true;
+                        break;
+                    }
+                }
+
+                if (!findParent) {
+                    tempChromosomes.add(this._population.get(this._population.size() - 1));
+                }
             }
 
-            double crossoverProbability = this.random.nextDouble();
+            double crossoverProbability = Math.random();
             if (crossoverProbability <= this._crossoverRatio) {
                 // From 2 parants, produce 2 child
                 this.crossover(tempChromosomes.get(0), tempChromosomes.get(1));
@@ -271,7 +284,7 @@ public class GeneticAlgorithm {
             }
         }
 
-        return this._population.get(this._population.size() - 1);
+        return this._population.get(0);
     }
 
     private void displayTrainError(int i) {
