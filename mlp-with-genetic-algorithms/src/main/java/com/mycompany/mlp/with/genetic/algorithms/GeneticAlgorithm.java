@@ -67,7 +67,7 @@ public class GeneticAlgorithm {
         for (int i = 0; i < this._countOfPopulation; i++) {
             ArrayList<Double> tempChromosome = new ArrayList<>(this._population.get(i));
             tempChromosome.set(this._countGenesOfChromosome,
-                    MLP.getTrainError(this._patterns, this._dimensionPatterns, this._nodes, tempChromosome));
+                    MLP.getTrainError(this._population.get(i), this._dimensionPatterns, this._nodes, tempChromosome));
             this._population.set(i, tempChromosome);
         }
     }

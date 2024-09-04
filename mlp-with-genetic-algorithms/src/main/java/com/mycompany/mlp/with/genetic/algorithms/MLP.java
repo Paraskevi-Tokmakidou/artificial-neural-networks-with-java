@@ -93,7 +93,14 @@ public class MLP {
         return sum;
     }
 
-    public static double getTrainError(ArrayList<ArrayList<Double>> patterns, int dimension, int nodes,
+    public static double getTrainError(ArrayList<Double> pattern, int dimension, int nodes,
+            ArrayList<Double> weights) {
+        double yx = pattern.get(dimension);
+        double ox = getOutput(pattern, nodes, dimension, weights);
+        return ((ox - yx) * (ox - yx));
+    }
+
+    public double calculateTestError(ArrayList<ArrayList<Double>> patterns, int dimension, int nodes,
             ArrayList<Double> weights) {
         double sum = 0.0;
 
@@ -160,19 +167,21 @@ public class MLP {
 
         double trainError = -1;
         for (int i = 0; i < this._maxEpoches; i++) {
-            trainError = getTrainError(this._patterns, this._dimension, this._nodes, this._weights);
+            for (int k = 0; k < this._patterns.size(); k++) {
+                trainError = getTrainError(this._patterns.get(k), this._dimension, this._nodes, this._weights);
 
-            if (trainError < 1e-5)
-                break;
-            else {
-                ArrayList<Double> deriv = getDeriv();
-                for (int j = 0; j < this._weights.size(); j++) {
-                    this._weights.set(j, this._weights.get(j) - this._learningRate * deriv.get(j));
+                if (trainError < 1e-5)
+                    break;
+                else {
+                    ArrayList<Double> deriv = getDeriv();
+                    for (int j = 0; j < this._weights.size(); j++) {
+                        this._weights.set(j, this._weights.get(j) - this._learningRate * deriv.get(j));
+                    }
                 }
-            }
 
-            if (this._wantToDisplayTrainErrorInEachEpoch) {
-                this.displayTrainError(i, trainError);
+                if (this._wantToDisplayTrainErrorInEachEpoch) {
+                    this.displayTrainError(i, trainError);
+                }
             }
         }
 
@@ -188,11 +197,10 @@ public class MLP {
     public double getTestError() {
         ArrayList<ArrayList<Double>> testPatterns = Data.getTestPatterns();
         if (testPatterns != null) {
-            return MLP.getTrainError(testPatterns, this._dimension, this._nodes, this._weights);
+            return this.calculateTestError(testPatterns, this._dimension, this._nodes, this._weights);
         } else {
             return -1.0;
         }
-
     }
 
     private void displayTrainError(int i, double trainError) {
