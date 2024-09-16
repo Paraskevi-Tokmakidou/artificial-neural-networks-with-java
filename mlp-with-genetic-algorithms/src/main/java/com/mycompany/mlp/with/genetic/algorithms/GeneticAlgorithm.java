@@ -12,9 +12,6 @@ import java.util.Random;
 public class GeneticAlgorithm {
     private ArrayList<ArrayList<Double>> _population;
     private ArrayList<ArrayList<Double>> _newPopulation;
-    private final ArrayList<ArrayList<Double>> _patterns;
-    private final int _dimensionPatterns;
-    private final int _nodes;
     private final int _countGenesOfChromosome;
     private final int _countOfPopulation;
     private final int _maxEpochs;
@@ -37,9 +34,6 @@ public class GeneticAlgorithm {
         this._elitismCountOfChromosomesThatPassToNextEpoch = (int) Math
                 .round(this._countOfPopulation * this._elitismRatio);
         this._countGenesOfChromosome = dimension;
-        this._patterns = Data.getTrainPatterns();
-        this._dimensionPatterns = Data.getDimension();
-        this._nodes = 10;
         this._population = new ArrayList<>();
         this._wantToDisplayTrainErrorInEachEpoch = true;
         this._crossoverOption = geneticCrossoverOption;
