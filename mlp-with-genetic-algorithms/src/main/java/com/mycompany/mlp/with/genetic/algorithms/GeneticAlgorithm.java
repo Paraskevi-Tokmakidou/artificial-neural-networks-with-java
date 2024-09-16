@@ -25,13 +25,14 @@ public class GeneticAlgorithm {
     private final boolean _wantToDisplayTrainErrorInEachEpoch;
     private final GENETIC_CROSSOVER_OPTIONS _crossoverOption;
     private Random random;
+    private MLP mlp;
 
     GeneticAlgorithm(int dimension, GENETIC_CROSSOVER_OPTIONS geneticCrossoverOption) {
         this.random = new Random();
-        this._countOfPopulation = 200;
-        this._maxEpochs = 300;
+        this._countOfPopulation = 100;
+        this._maxEpochs = 50;
         this._crossoverRatio = 0.95; // 95%
-        this._elitismRatio = 0.05; // 5%
+        this._elitismRatio = 0.04; // 4%
         this._mutationRatio = 0.02; // 2%
         this._elitismCountOfChromosomesThatPassToNextEpoch = (int) Math
                 .round(this._countOfPopulation * this._elitismRatio);
@@ -40,14 +41,15 @@ public class GeneticAlgorithm {
         this._dimensionPatterns = Data.getDimension();
         this._nodes = Data.getNodes();
         this._population = new ArrayList<>();
-        this._wantToDisplayTrainErrorInEachEpoch = false;
+        this._wantToDisplayTrainErrorInEachEpoch = true;
         this._crossoverOption = geneticCrossoverOption;
+        mlp = new MLP();
     }
 
     private void randomInitializationGenes() {
         this._population = new ArrayList<>();
 
-        double min = -1;
+        double min = 0;
         double max = 1;
 
         for (int i = 0; i < this._countOfPopulation; i++) {
@@ -66,8 +68,8 @@ public class GeneticAlgorithm {
     private void calculateFitness() {
         for (int i = 0; i < this._countOfPopulation; i++) {
             ArrayList<Double> tempChromosome = new ArrayList<>(this._population.get(i));
-            tempChromosome.set(this._countGenesOfChromosome,
-                    MLP.getTrainError(this._population.get(i), this._dimensionPatterns, this._nodes, tempChromosome));
+            Double fitnessValueOfChromosome = mlp.calculateError(this._population.get(i));
+            tempChromosome.set(this._countGenesOfChromosome, fitnessValueOfChromosome);
             this._population.set(i, tempChromosome);
         }
     }
@@ -105,7 +107,8 @@ public class GeneticAlgorithm {
 
         for (int i = 0; i < this._population.size(); i++) {
             ArrayList<Double> inner = new ArrayList<>(this._population.get(i));
-            inner.set(this._countGenesOfChromosome + 1, inner.get(this._countGenesOfChromosome) / sumFitnessValue);
+            Double normalizationValue = (inner.get(this._countGenesOfChromosome) / sumFitnessValue);
+            inner.set(this._countGenesOfChromosome + 1, normalizationValue);
             this._population.set(i, inner);
         }
     }

@@ -30,7 +30,6 @@ public class Frame extends JFrame {
     private final String SUCCESS_LOAD_CUSTOM_DATASETS = "<html><br/><h2>Succeed action!</h2></html>";
     private final String NEED_DATASETS = "<html><h2>Need to load a dataset first</h2></html>";
     private final String NEED_TRAIN_DATASETS = "<html><h2>Need to load a train dataset first</h2></html>";
-    private final String WAIT_TRAINING = "<html><h2>Wait for training</h2></html>";
     private final MenuBar menuBar;
     private final Menu menuMenu, datasetMenu, algorithmsMenu;
     private final MenuItem[] menuItems, datasetItems, algorithmsItems;
@@ -167,7 +166,6 @@ public class Frame extends JFrame {
                     if (!loadedDatasets)
                         this.setTextLabel(this.NEED_DATASETS);
                     else {
-                        this.setTextLabel(this.WAIT_TRAINING);
                         MLP mlp = new MLP();
                         Double trainError = mlp.train(false, null);
                         Double testError = mlp.getTestError();
@@ -176,7 +174,7 @@ public class Frame extends JFrame {
                                 "<html>"
                                         + "<h2>"
                                         + "<br/><br/><br/><br/><br/>"
-                                        + "<table style='font: 16px Arial, Helvetica, sans-serif;;'>"
+                                        + "<table style='font: 16px Arial, Helvetica, sans-serif;'>"
                                         + "<tr>"
                                         + "<td>"
                                         + " Train Error: "
@@ -203,7 +201,6 @@ public class Frame extends JFrame {
                     if (!loadedDatasets)
                         this.setTextLabel(this.NEED_DATASETS);
                     else {
-                        this.setTextLabel(this.WAIT_TRAINING);
                         MLP mlp = new MLP();
                         Double trainError = mlp.train(true, GENETIC_CROSSOVER_OPTIONS.SINGLE);
                         Double testError = mlp.getTestError();
@@ -239,7 +236,6 @@ public class Frame extends JFrame {
                     if (!loadedDatasets)
                         this.setTextLabel(this.NEED_DATASETS);
                     else {
-                        this.setTextLabel(this.WAIT_TRAINING);
                         MLP mlp = new MLP();
                         Double trainError = mlp.train(true, GENETIC_CROSSOVER_OPTIONS.DOUBLE);
                         Double testError = mlp.getTestError();

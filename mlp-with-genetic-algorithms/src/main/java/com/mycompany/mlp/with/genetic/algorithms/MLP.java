@@ -27,7 +27,7 @@ public class MLP {
         this._weights = new ArrayList<>();
         this._learningRate = Data.getLearning_rate();
         this._maxEpoches = Data.getMax_epoches();
-        this._wantToDisplayTrainErrorInEachEpoch = false;
+        this._wantToDisplayTrainErrorInEachEpoch = true;
 
         System.out.println("Count of patterns: " + this._count);
         System.out.println("Dimension: " + this._dimension);
@@ -36,11 +36,11 @@ public class MLP {
 
     private void initializeRandomWeights(Integer countOfWeightsDimension) {
         Random random = new Random();
-        double min = -1;
-        double max = 1;
+        Double min = 0.0;
+        Double max = 1.0;
 
         for (int i = 0; i < countOfWeightsDimension; i++) {
-            Double randomValue = min + (max - min) * random.nextDouble();
+            Double randomValue = min + (max - min) * random.nextDouble(); // [0,1]
             this._weights.add(randomValue);
         }
     }
@@ -61,9 +61,9 @@ public class MLP {
         this._uniqueOutputClasses = new ArrayList<>();
 
         for (int i = 0; i < this._patterns.size(); i++) {
-            if (this._uniqueOutputClasses.isEmpty())
+            if (this._uniqueOutputClasses.isEmpty()) {
                 this._uniqueOutputClasses.add(this._patterns.get(i).get(this._dimension));
-            else {
+            } else {
                 if (this._uniqueOutputClasses.indexOf(this._patterns.get(i).get(this._dimension)) == -1) {
                     this._uniqueOutputClasses.add(this._patterns.get(i).get(this._dimension));
                 }
@@ -73,45 +73,45 @@ public class MLP {
         System.out.println("Unique classes: " + _uniqueOutputClasses);
     }
 
-    public static double getOutput(ArrayList<Double> pattern, int nodes, int dimension, ArrayList<Double> weights) {
+    public double getOutput(ArrayList<Double> pattern) {
         double sum = 0.0;
 
-        for (int i = 0; i < nodes; i++) {
+        for (int i = 0; i < this._nodes; i++) {
             double arg = 0.0;
 
-            for (int j = 0; j < dimension; j++) {
-                int posj = (dimension + 2) * (i + 1) - (dimension + 1) + (j + 1);
-                arg += weights.get(posj - 1) * pattern.get((j + 1) - 1);
+            for (int j = 0; j < this._dimension; j++) {
+                int posj = (this._dimension + 2) * (i + 1) - (this._dimension + 1) + (j + 1);
+                arg += this._weights.get(posj - 1) * pattern.get((j + 1) - 1);
             }
 
-            int posbias = (dimension + 2) * (i + 1);
-            arg += weights.get(posbias - 1);
-            int pos = (dimension + 2) * (i + 1) - (dimension + 1);
-            sum += weights.get(pos - 1) * MathematicalFunctions.sig(arg);
+            int posbias = (this._dimension + 2) * (i + 1);
+            arg += this._weights.get(posbias - 1);
+            int pos = (this._dimension + 2) * (i + 1) - (this._dimension + 1);
+            sum += this._weights.get(pos - 1) * MathematicalFunctions.sig(arg);
         }
 
         return sum;
     }
 
-    public static double getTrainError(ArrayList<Double> pattern, int dimension, int nodes,
-            ArrayList<Double> weights) {
-        double yx = pattern.get(dimension);
-        double ox = getOutput(pattern, nodes, dimension, weights);
-        return ((ox - yx) * (ox - yx));
+    public double getTrainError(Double wanted_ouput, Double output) { // E
+        return ((wanted_ouput - output) * (wanted_ouput - output));
     }
 
-    public double calculateTestError(ArrayList<ArrayList<Double>> patterns, int dimension, int nodes,
-            ArrayList<Double> weights) {
-        double sum = 0.0;
+    public Double calculateTestError(ArrayList<ArrayList<Double>> patterns) {
+        if (patterns == null) {
+            return -1.0;
+        }
+
+        Double sum = 0.0;
 
         for (int i = 0; i < patterns.size(); i++) {
             // The desired output
-            double yx = patterns.get(i).get(dimension);
-            double ox = getOutput(patterns.get(i), nodes, dimension, weights);
-            sum += (ox - yx) * (ox - yx);
+            double wanted_output = patterns.get(i).get(this._dimension);
+            double output = getOutput(patterns.get(i));
+            sum += (output - wanted_output) * (output - wanted_output);
         }
 
-        return sum;
+        return (sum / this._patterns.size());
     }
 
     private ArrayList<Double> getPatternDeriv(ArrayList<Double> pattern) {
@@ -151,37 +151,46 @@ public class MLP {
 
         for (int i = 0; i < this._patterns.size(); i++) {
             ArrayList<Double> patternDeriv = getPatternDeriv(this._patterns.get(i));
-            double yx = this._patterns.get(i).get(this._dimension);
-            double ox = getOutput(this._patterns.get(i), this._nodes, this._dimension, this._weights);
+            double wanted_output = this._patterns.get(i).get(this._dimension);
+            double output = getOutput(this._patterns.get(i));
 
             for (int j = 0; j < deriv.size(); j++) {
-                deriv.set(j, 2.0 * (ox - yx) * patternDeriv.get(j));
+                deriv.set(j, 2.0 * (output - wanted_output) * patternDeriv.get(j));
             }
         }
         return deriv;
     }
 
-    public double train(Boolean geneticOption, GENETIC_CROSSOVER_OPTIONS geneticCrossoverOption) {
+    public Double train(Boolean geneticOption, GENETIC_CROSSOVER_OPTIONS geneticCrossoverOption) {
         this.initializeWeights(geneticOption, geneticCrossoverOption);
         this.findUniqueClasses();
 
-        double trainError = -1;
+        Double trainError = -1.0;
         for (int i = 0; i < this._maxEpoches; i++) {
+            boolean shouldBreak = false;
             for (int k = 0; k < this._patterns.size(); k++) {
-                trainError = getTrainError(this._patterns.get(k), this._dimension, this._nodes, this._weights);
+                ArrayList<Double> pattern = this._patterns.get(k);
 
-                if (trainError < 1e-5)
+                Double output = getOutput(pattern);
+                trainError = this.getTrainError(pattern.get(this._dimension), output);
+
+                if (trainError < 0) {
+                    shouldBreak = true;
                     break;
-                else {
-                    ArrayList<Double> deriv = getDeriv();
-                    for (int j = 0; j < this._weights.size(); j++) {
-                        this._weights.set(j, this._weights.get(j) - this._learningRate * deriv.get(j));
-                    }
                 }
 
-                if (this._wantToDisplayTrainErrorInEachEpoch) {
-                    this.displayTrainError(i, trainError);
+                ArrayList<Double> deriv = getDeriv();
+                for (int j = 0; j < this._weights.size(); j++) { // Gradient Descent
+                    this._weights.set(j, this._weights.get(j) - this._learningRate * deriv.get(j));
                 }
+            }
+
+            if (this._wantToDisplayTrainErrorInEachEpoch) {
+                this.displayTrainError(i, trainError);
+            }
+
+            if (shouldBreak) {
+                break;
             }
         }
 
@@ -194,13 +203,33 @@ public class MLP {
         return trainError;
     }
 
-    public double getTestError() {
+    public Double getTestError() {
         ArrayList<ArrayList<Double>> testPatterns = Data.getTestPatterns();
-        if (testPatterns != null) {
-            return this.calculateTestError(testPatterns, this._dimension, this._nodes, this._weights);
-        } else {
+
+        if (testPatterns == null) {
             return -1.0;
         }
+
+        return this.calculateTestError(testPatterns);
+    }
+
+    public Double calculateError(ArrayList<Double> weights) {
+        if (weights == null) {
+            return -1.0;
+        }
+
+        this._weights = new ArrayList<>(weights);
+
+        Double sum = 0.0;
+
+        for (int i = 0; i < this._patterns.size(); i++) {
+            // The desired output
+            double wanted_output = this._patterns.get(i).get(this._dimension);
+            double output = getOutput(this._patterns.get(i));
+            sum += (output - wanted_output) * (output - wanted_output);
+        }
+
+        return (sum / this._patterns.size());
     }
 
     private void displayTrainError(int i, double trainError) {
