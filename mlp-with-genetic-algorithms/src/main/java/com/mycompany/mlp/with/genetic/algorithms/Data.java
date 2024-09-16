@@ -12,7 +12,7 @@ public class Data {
     private static ArrayList<ArrayList<Double>> testPatterns;
     private static int dimension;
     private static int nodes = 10;
-    private static double learning_rate = 0.01;
+    private static Double learning_rate = 0.01;
     private static int max_epoches = 40;
 
     /**
@@ -74,14 +74,14 @@ public class Data {
     /**
      * @return the learning_rate
      */
-    public static double getLearning_rate() {
+    public static Double getLearning_rate() {
         return learning_rate;
     }
 
     /**
      * @param aLearning_rate the learning_rate to set
      */
-    public static void setLearning_rate(double aLearning_rate) {
+    public static void setLearning_rate(Double aLearning_rate) {
         learning_rate = aLearning_rate;
     }
 

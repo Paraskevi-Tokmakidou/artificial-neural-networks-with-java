@@ -154,7 +154,7 @@ public class MLP {
 
                 trainError = this.getTrainError(pattern.get(this._dimension), output);
 
-                if (trainError < 0) {
+                if (trainError < 0.01) {
                     shouldBreak = true;
                     break;
                 }
