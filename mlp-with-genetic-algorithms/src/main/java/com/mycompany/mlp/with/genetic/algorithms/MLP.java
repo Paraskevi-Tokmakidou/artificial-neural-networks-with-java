@@ -22,11 +22,11 @@ public class MLP {
     MLP() {
         this._patterns = Data.getTrainPatterns();
         this._count = this._patterns.size();
-        this._nodes = Data.getNodes();
+        this._nodes = 10;
         this._dimension = Data.getDimension();
         this._weights = new ArrayList<>();
-        this._learningRate = Data.getLearning_rate();
-        this._maxEpoches = Data.getMax_epoches();
+        this._learningRate = 0.01;
+        this._maxEpoches = 100;
         this._wantToDisplayTrainErrorInEachEpoch = true;
 
         System.out.println("Count of patterns: " + this._count);

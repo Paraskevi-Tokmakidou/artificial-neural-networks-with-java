@@ -39,7 +39,7 @@ public class GeneticAlgorithm {
         this._countGenesOfChromosome = dimension;
         this._patterns = Data.getTrainPatterns();
         this._dimensionPatterns = Data.getDimension();
-        this._nodes = Data.getNodes();
+        this._nodes = 10;
         this._population = new ArrayList<>();
         this._wantToDisplayTrainErrorInEachEpoch = true;
         this._crossoverOption = geneticCrossoverOption;
