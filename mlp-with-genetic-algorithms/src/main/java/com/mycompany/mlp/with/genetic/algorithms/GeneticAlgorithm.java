@@ -44,7 +44,7 @@ public class GeneticAlgorithm {
         this._population = new ArrayList<>();
 
         Double min = 0.0;
-        Double max = 0.1;
+        Double max = 1.0;
 
         for (int i = 0; i < this._countOfPopulation; i++) {
             ArrayList<Double> tempChromosome = new ArrayList<>();
