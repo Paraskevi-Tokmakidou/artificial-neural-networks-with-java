@@ -141,24 +141,6 @@ public class MLP {
         return patternDeriv;
     }
 
-    private ArrayList<Double> getDeriv() {
-        ArrayList<Double> deriv = new ArrayList<>();
-        this._weights.forEach(_item -> {
-            deriv.add(0.0);
-        });
-
-        for (int i = 0; i < this._patterns.size(); i++) {
-            ArrayList<Double> patternDeriv = getPatternDeriv(this._patterns.get(i));
-            Double wanted_output = this._patterns.get(i).get(this._dimension);
-            Double output = getOutput(this._patterns.get(i));
-
-            for (int j = 0; j < deriv.size(); j++) {
-                deriv.set(j, 2.0 * (output - wanted_output) * patternDeriv.get(j));
-            }
-        }
-        return deriv;
-    }
-
     public Double train(Boolean geneticOption, GENETIC_CROSSOVER_OPTIONS geneticCrossoverOption) {
         this.initializeWeights(geneticOption, geneticCrossoverOption);
         this.findUniqueClasses();
@@ -168,8 +150,8 @@ public class MLP {
             boolean shouldBreak = false;
             for (int k = 0; k < this._patterns.size(); k++) {
                 ArrayList<Double> pattern = this._patterns.get(k);
-
                 Double output = getOutput(pattern);
+
                 trainError = this.getTrainError(pattern.get(this._dimension), output);
 
                 if (trainError < 0) {
@@ -177,7 +159,7 @@ public class MLP {
                     break;
                 }
 
-                ArrayList<Double> deriv = getDeriv();
+                ArrayList<Double> deriv = this.getPatternDeriv(pattern);
                 for (int j = 0; j < this._weights.size(); j++) { // Gradient Descent
                     this._weights.set(j, this._weights.get(j) - this._learningRate * deriv.get(j));
                 }
