@@ -77,17 +77,15 @@ public class MLP {
         double sum = 0.0;
 
         for (int i = 0; i < this._nodes; i++) {
-            double arg = 0.0;
+            int posbias = (this._dimension + 2) * i;
 
+            double arg = 0.0;
             for (int j = 0; j < this._dimension; j++) {
-                int posj = (this._dimension + 2) * (i + 1) - (this._dimension + 1) + (j + 1);
-                arg += this._weights.get(posj - 1) * pattern.get((j + 1) - 1);
+                arg += pattern.get(j) * this._weights.get(posbias) - (this._dimension + 1) + j
+                        + this._weights.get(posbias);
             }
 
-            int posbias = (this._dimension + 2) * (i + 1);
-            arg += this._weights.get(posbias - 1);
-            int pos = (this._dimension + 2) * (i + 1) - (this._dimension + 1);
-            sum += this._weights.get(pos - 1) * MathematicalFunctions.sig(arg);
+            sum += this._weights.get(posbias) - (this._dimension + 1) * MathematicalFunctions.sig(arg);
         }
 
         return sum;
