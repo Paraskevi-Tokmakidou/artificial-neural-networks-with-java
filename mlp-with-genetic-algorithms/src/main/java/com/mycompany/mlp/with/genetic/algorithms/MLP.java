@@ -26,7 +26,7 @@ public class MLP {
         this._dimension = Data.getDimension();
         this._weights = new ArrayList<>();
         this._learningRate = 0.01;
-        this._maxEpoches = 100;
+        this._maxEpoches = 50;
         this._wantToDisplayTrainErrorInEachEpoch = true;
 
         System.out.println("Count of patterns: " + this._count);

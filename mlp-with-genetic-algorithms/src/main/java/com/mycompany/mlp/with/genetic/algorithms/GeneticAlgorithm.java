@@ -26,8 +26,8 @@ public class GeneticAlgorithm {
 
     GeneticAlgorithm(int dimension, GENETIC_CROSSOVER_OPTIONS geneticCrossoverOption) {
         this.random = new Random();
-        this._countOfPopulation = 100;
-        this._maxEpochs = 50;
+        this._countOfPopulation = 500;
+        this._maxEpochs = 60;
         this._crossoverRatio = 0.95; // 95%
         this._elitismRatio = 0.04; // 4%
         this._mutationRatio = 0.02; // 2%
