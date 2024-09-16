@@ -18,9 +18,9 @@ public class GeneticAlgorithm {
     private final int _countGenesOfChromosome;
     private final int _countOfPopulation;
     private final int _maxEpochs;
-    private final double _crossoverRatio;
-    private final double _elitismRatio;
-    private final double _mutationRatio;
+    private final Double _crossoverRatio;
+    private final Double _elitismRatio;
+    private final Double _mutationRatio;
     private final int _elitismCountOfChromosomesThatPassToNextEpoch;
     private final boolean _wantToDisplayTrainErrorInEachEpoch;
     private final GENETIC_CROSSOVER_OPTIONS _crossoverOption;
@@ -49,8 +49,8 @@ public class GeneticAlgorithm {
     private void randomInitializationGenes() {
         this._population = new ArrayList<>();
 
-        double min = 0;
-        double max = 1;
+        Double min = 0.0;
+        Double max = 0.1;
 
         for (int i = 0; i < this._countOfPopulation; i++) {
             ArrayList<Double> tempChromosome = new ArrayList<>();
@@ -82,7 +82,7 @@ public class GeneticAlgorithm {
         }
 
         if (hasNegativeFitnessValue) {
-            double minFitnessValue = this._population.get(0).get(this._countGenesOfChromosome);
+            Double minFitnessValue = this._population.get(0).get(this._countGenesOfChromosome);
             for (int i = 0; i < this._population.size(); i++) {
                 if (this._population.get(i).get(this._countGenesOfChromosome) < minFitnessValue)
                     minFitnessValue = this._population.get(i).get(this._countGenesOfChromosome);
@@ -90,7 +90,7 @@ public class GeneticAlgorithm {
 
             minFitnessValue = Math.abs(minFitnessValue);
             for (int i = 0; i < this._population.size(); i++) {
-                double scaledFitnessValue = 1.0 * this._population.get(i).get(this._countGenesOfChromosome)
+                Double scaledFitnessValue = 1.0 * this._population.get(i).get(this._countGenesOfChromosome)
                         + minFitnessValue + 1; // +1 to avoid devide by zero after
                 this._population.get(i).set(this._countGenesOfChromosome, scaledFitnessValue);
             }
@@ -100,7 +100,7 @@ public class GeneticAlgorithm {
     // Devide the fitness value of each chromosome
     // by the total values of all fitnesses
     private void normalizeFitnessValues() {
-        double sumFitnessValue = 0.0;
+        Double sumFitnessValue = 0.0;
         for (int k = 0; k < this._population.size(); k++) {
             sumFitnessValue += this._population.get(k).get(this._countGenesOfChromosome);
         }
@@ -121,7 +121,7 @@ public class GeneticAlgorithm {
     private void calculateCumulativeSumOfNormalizedFitnessValues() {
         for (int i = 0; i < this._population.size(); i++) {
             ArrayList<Double> temp = new ArrayList<>(this._population.get(i));
-            double sum = temp.get(this._countGenesOfChromosome + 1);
+            Double sum = temp.get(this._countGenesOfChromosome + 1);
             for (int j = (i + 1); j < this._population.size(); j++) {
                 sum += this._population.get(j).get(this._countGenesOfChromosome + 1);
             }
@@ -155,7 +155,7 @@ public class GeneticAlgorithm {
         if (this._crossoverOption == GENETIC_CROSSOVER_OPTIONS.SINGLE) {
             this.singlePointCrossover(parent1, parent2, randomGenePosition);
         } else {
-            this.doublePointCrossover(parent1, parent2, randomGenePosition, secondRandomGenePosition);
+            this.DoublePointCrossover(parent1, parent2, randomGenePosition, secondRandomGenePosition);
         }
     }
 
@@ -177,7 +177,7 @@ public class GeneticAlgorithm {
         this._newPopulation.add(child);
     }
 
-    private void doublePointCrossover(ArrayList<Double> parent1, ArrayList<Double> parent2, int randomGenePosition,
+    private void DoublePointCrossover(ArrayList<Double> parent1, ArrayList<Double> parent2, int randomGenePosition,
             int secondRandomGenePosition) {
         ArrayList<Double> child = new ArrayList<>();
         // 0 - randomGenePosition
@@ -205,7 +205,7 @@ public class GeneticAlgorithm {
             ArrayList<ArrayList<Double>> tempChromosomes = new ArrayList<>();
 
             for (int i = 0; i < 2; i++) {
-                double randomCumulativeValue = Math.random();
+                Double randomCumulativeValue = Math.random();
                 boolean findParent = false;
                 for (int k = 1; k < this._population.size(); k++) {
                     if (randomCumulativeValue > this._population.get(k).get(this._countGenesOfChromosome + 2)) {
@@ -220,7 +220,7 @@ public class GeneticAlgorithm {
                 }
             }
 
-            double crossoverProbability = Math.random();
+            Double crossoverProbability = Math.random();
             if (crossoverProbability <= this._crossoverRatio) {
                 // From 2 parants, produce 2 child
                 this.crossover(tempChromosomes.get(0), tempChromosomes.get(1));
@@ -237,10 +237,10 @@ public class GeneticAlgorithm {
             ArrayList<Double> currentChromosome = this._newPopulation.get(i);
 
             for (int j = 0; j < currentChromosome.size(); j++) {
-                double gene = currentChromosome.get(j);
+                Double gene = currentChromosome.get(j);
 
                 if (j < currentChromosome.size() - 3) {
-                    double mutationProbability = Math.random();
+                    Double mutationProbability = Math.random();
 
                     if (mutationProbability <= this._mutationRatio) {
                         gene += gene * mutationProbability;
