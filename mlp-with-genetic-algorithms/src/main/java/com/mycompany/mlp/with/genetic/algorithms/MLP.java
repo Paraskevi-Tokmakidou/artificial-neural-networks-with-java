@@ -36,8 +36,8 @@ public class MLP {
 
     private void initializeRandomWeights(Integer countOfWeightsDimension) {
         Random random = new Random();
-        Double min = 0.0;
-        Double max = 1.0;
+        Double min = MlpConfig.getMin_value();
+        Double max = MlpConfig.getMax_value();
 
         for (int i = 0; i < countOfWeightsDimension; i++) {
             Double randomValue = min + (max - min) * random.nextDouble(); // [0,1]
@@ -73,19 +73,21 @@ public class MLP {
         System.out.println("Unique classes: " + _uniqueOutputClasses);
     }
 
-    public Double getOutput(ArrayList<Double> pattern) {
-        Double sum = 0.0;
+    public double getOutput(ArrayList<Double> pattern) {
+        double sum = 0.0;
 
         for (int i = 0; i < this._nodes; i++) {
-            int posbias = (this._dimension + 2) * i;
+            double arg = 0.0;
 
-            Double arg = 0.0;
             for (int j = 0; j < this._dimension; j++) {
-                arg += pattern.get(j) * this._weights.get(posbias) - (this._dimension + 1) + j
-                        + this._weights.get(posbias);
+                int posj = (this._dimension + 2) * (i + 1) - (this._dimension + 1) + (j + 1);
+                arg += this._weights.get(posj - 1) * pattern.get((j + 1) - 1);
             }
 
-            sum += this._weights.get(posbias) - (this._dimension + 1) * MathematicalFunctions.sig(arg);
+            int posbias = (this._dimension + 2) * (i + 1);
+            arg += this._weights.get(posbias - 1);
+            int pos = (this._dimension + 2) * (i + 1) - (this._dimension + 1);
+            sum += this._weights.get(pos - 1) * MathematicalFunctions.sig(arg);
         }
 
         return sum;
@@ -141,6 +143,24 @@ public class MLP {
         return patternDeriv;
     }
 
+    private ArrayList<Double> getDeriv() {
+        ArrayList<Double> deriv = new ArrayList<>();
+        this._weights.forEach(_item -> {
+            deriv.add(0.0);
+        });
+
+        for (int i = 0; i < this._patterns.size(); i++) {
+            ArrayList<Double> patternDeriv = getPatternDeriv(this._patterns.get(i));
+            Double wanted_output = this._patterns.get(i).get(this._dimension);
+            Double output = getOutput(this._patterns.get(i));
+
+            for (int j = 0; j < deriv.size(); j++) {
+                deriv.set(j, 2.0 * (output - wanted_output) * patternDeriv.get(j));
+            }
+        }
+        return deriv;
+    }
+
     public Double train(Boolean geneticOption, GENETIC_CROSSOVER_OPTIONS geneticCrossoverOption) {
         this.initializeWeights(geneticOption, geneticCrossoverOption);
         this.findUniqueClasses();
@@ -150,16 +170,16 @@ public class MLP {
             boolean shouldBreak = false;
             for (int k = 0; k < this._patterns.size(); k++) {
                 ArrayList<Double> pattern = this._patterns.get(k);
-                Double output = getOutput(pattern);
 
+                Double output = getOutput(pattern);
                 trainError = this.getTrainError(pattern.get(this._dimension), output);
 
-                if (trainError < 0.01) {
+                if (trainError < 0) {
                     shouldBreak = true;
                     break;
                 }
 
-                ArrayList<Double> deriv = this.getPatternDeriv(pattern);
+                ArrayList<Double> deriv = getDeriv();
                 for (int j = 0; j < this._weights.size(); j++) { // Gradient Descent
                     this._weights.set(j, this._weights.get(j) - this._learningRate * deriv.get(j));
                 }
