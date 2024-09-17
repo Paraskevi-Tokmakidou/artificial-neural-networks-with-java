@@ -26,11 +26,11 @@ public class GeneticAlgorithm {
 
     GeneticAlgorithm(int dimension, GENETIC_CROSSOVER_OPTIONS geneticCrossoverOption) {
         this.random = new Random();
-        this._countOfPopulation = 500;
-        this._maxEpochs = 60;
-        this._crossoverRatio = 0.95; // 95%
-        this._elitismRatio = 0.04; // 4%
-        this._mutationRatio = 0.02; // 2%
+        this._countOfPopulation = GaConfig.getCount_of_population();
+        this._maxEpochs = GaConfig.getMax_epoches();
+        this._crossoverRatio = GaConfig.getCrossoverRatio(); 
+        this._elitismRatio = GaConfig.getElitismRatio();
+        this._mutationRatio = GaConfig.getMutatioRatio(); 
         this._elitismCountOfChromosomesThatPassToNextEpoch = (int) Math
                 .round(this._countOfPopulation * this._elitismRatio);
         this._countGenesOfChromosome = dimension;
