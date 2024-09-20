@@ -28,9 +28,9 @@ public class GeneticAlgorithm {
         this.random = new Random();
         this._countOfPopulation = GaConfig.getCount_of_population();
         this._maxEpochs = GaConfig.getMax_epoches();
-        this._crossoverRatio = GaConfig.getCrossoverRatio(); 
+        this._crossoverRatio = GaConfig.getCrossoverRatio();
         this._elitismRatio = GaConfig.getElitismRatio();
-        this._mutationRatio = GaConfig.getMutatioRatio(); 
+        this._mutationRatio = GaConfig.getMutatioRatio();
         this._elitismCountOfChromosomesThatPassToNextEpoch = (int) Math
                 .round(this._countOfPopulation * this._elitismRatio);
         this._countGenesOfChromosome = dimension;
@@ -261,19 +261,17 @@ public class GeneticAlgorithm {
     }
 
     public ArrayList<Double> getBestChromosome() {
+        this.randomInitializationGenes();
+        this.fitnessFunctions();
+
         for (int i = 0; i < this._maxEpochs; i++) {
-            if (i == 0) {
-                this.randomInitializationGenes();
-            } else {
-                this._newPopulation = new ArrayList<>();
-                this.elitism();
-                this.selection();
-                this.mutation();
+            this._newPopulation = new ArrayList<>();
+            this.elitism();
+            this.selection();
+            this.mutation();
 
-                this._population = new ArrayList<>(this._newPopulation);
-                this._newPopulation = new ArrayList<>();
-            }
-
+            this._population = new ArrayList<>(this._newPopulation);
+            this._newPopulation = new ArrayList<>();
             this.fitnessFunctions();
 
             if (this._wantToDisplayTrainErrorInEachEpoch) {
