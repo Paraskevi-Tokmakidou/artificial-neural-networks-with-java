@@ -73,31 +73,30 @@ public class MLP {
         System.out.println("Unique classes: " + _uniqueOutputClasses);
     }
 
-    public double getOutput(ArrayList<Double> pattern) {
-        double sum = 0.0;
+    public Double getOutput(ArrayList<Double> pattern) {
+        Double output = 0.0;
 
-        for (int i = 0; i < this._nodes; i++) {
-            double arg = 0.0;
+        for (int i = 1; i < this._nodes; i++) {
 
-            for (int j = 0; j < this._dimension; j++) {
-                int posj = (this._dimension + 2) * (i + 1) - (this._dimension + 1) + (j + 1);
-                arg += this._weights.get(posj - 1) * pattern.get((j + 1) - 1);
+            Double innerSum = 0.0;
+            for (int j = 1; j < this._dimension; j++) {
+                innerSum += pattern.get(j)
+                        * this._weights.get((this._dimension + 2) * (i) - (this._dimension + 1) + (j))
+                        + this._weights.get((this._dimension + 2) * (i));
             }
 
-            int posbias = (this._dimension + 2) * (i + 1);
-            arg += this._weights.get(posbias - 1);
-            int pos = (this._dimension + 2) * (i + 1) - (this._dimension + 1);
-            sum += this._weights.get(pos - 1) * MathematicalFunctions.sig(arg);
+            output += this._weights.get((this._dimension + 2) * (i) - (this._dimension + 1))
+                    * MathematicalFunctions.sig(innerSum);
         }
 
-        return sum;
+        return output;
     }
 
     public Double getTrainError(Double wanted_ouput, Double output) { // E
         return ((wanted_ouput - output) * (wanted_ouput - output));
     }
 
-    public Double calculateTestError(ArrayList<ArrayList<Double>> patterns) {
+    public Double calculateMseWithoutLearning(ArrayList<ArrayList<Double>> patterns) {
         if (patterns == null) {
             return -1.0;
         }
@@ -143,21 +142,19 @@ public class MLP {
         return patternDeriv;
     }
 
-    private ArrayList<Double> getDeriv() {
+    private ArrayList<Double> getDeriv(ArrayList<Double> pattern, Double output) {
         ArrayList<Double> deriv = new ArrayList<>();
         this._weights.forEach(_item -> {
             deriv.add(0.0);
         });
 
-        for (int i = 0; i < this._patterns.size(); i++) {
-            ArrayList<Double> patternDeriv = getPatternDeriv(this._patterns.get(i));
-            Double wanted_output = this._patterns.get(i).get(this._dimension);
-            Double output = getOutput(this._patterns.get(i));
+        ArrayList<Double> patternDeriv = getPatternDeriv(pattern);
+        Double wanted_output = pattern.get(this._dimension);
 
-            for (int j = 0; j < deriv.size(); j++) {
-                deriv.set(j, 2.0 * (output - wanted_output) * patternDeriv.get(j));
-            }
+        for (int j = 0; j < deriv.size(); j++) {
+            deriv.set(j, 2.0 * (output - wanted_output) * patternDeriv.get(j));
         }
+
         return deriv;
     }
 
@@ -165,42 +162,37 @@ public class MLP {
         this.initializeWeights(geneticOption, geneticCrossoverOption);
         this.findUniqueClasses();
 
-        Double trainError = -1.0;
+        Double epochTrainError = -1.0;
         for (int i = 0; i < this._maxEpoches; i++) {
-            boolean shouldBreak = false;
             for (int k = 0; k < this._patterns.size(); k++) {
                 ArrayList<Double> pattern = this._patterns.get(k);
-
                 Double output = getOutput(pattern);
-                trainError = this.getTrainError(pattern.get(this._dimension), output);
 
-                if (trainError < 0) {
-                    shouldBreak = true;
-                    break;
-                }
+                ArrayList<Double> deriv = getDeriv(pattern, output); // Back Propagation
 
-                ArrayList<Double> deriv = getDeriv();
                 for (int j = 0; j < this._weights.size(); j++) { // Gradient Descent
                     this._weights.set(j, this._weights.get(j) - this._learningRate * deriv.get(j));
                 }
             }
 
+            epochTrainError = this.calculateMseWithoutLearning(this._patterns);
+
             if (this._wantToDisplayTrainErrorInEachEpoch) {
-                this.displayTrainError(i, trainError);
+                this.displayTrainError(i, epochTrainError);
             }
 
-            if (shouldBreak) {
+            if (epochTrainError <= 0) {
                 break;
             }
         }
 
-        if (trainError > -1) {
+        if (epochTrainError > -1) {
             System.out.println("******************");
         } else {
             System.out.println("Something went wrong!");
         }
 
-        return trainError;
+        return epochTrainError;
     }
 
     public Double getTestError() {
@@ -210,7 +202,7 @@ public class MLP {
             return -1.0;
         }
 
-        return this.calculateTestError(testPatterns);
+        return this.calculateMseWithoutLearning(testPatterns);
     }
 
     public Double calculateError(ArrayList<Double> weights) {
