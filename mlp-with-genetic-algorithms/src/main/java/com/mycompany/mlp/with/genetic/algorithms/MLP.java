@@ -40,7 +40,7 @@ public class MLP {
         Double max = MlpConfig.getMax_value();
 
         for (int i = 0; i < countOfWeightsDimension; i++) {
-            Double randomValue = min + (max - min) * random.nextDouble(); // [0,1]
+            Double randomValue = min + (max - min) * random.nextDouble();
             this._weights.add(randomValue);
         }
     }
@@ -104,10 +104,9 @@ public class MLP {
         Double sum = 0.0;
 
         for (int i = 0; i < patterns.size(); i++) {
-            // The desired output
             Double wanted_output = patterns.get(i).get(this._dimension);
             Double output = getOutput(patterns.get(i));
-            sum += (output - wanted_output) * (output - wanted_output);
+            sum += this.getTrainError(wanted_output, output);
         }
 
         return (sum / this._patterns.size());

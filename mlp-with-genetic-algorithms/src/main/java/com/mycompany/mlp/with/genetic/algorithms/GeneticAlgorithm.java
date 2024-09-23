@@ -43,8 +43,8 @@ public class GeneticAlgorithm {
     private void randomInitializationGenes() {
         this._population = new ArrayList<>();
 
-        Double min = 0.0;
-        Double max = 1.0;
+        Double min = GaConfig.getMin_value();
+        Double max = GaConfig.getMax_value();
 
         for (int i = 0; i < this._countOfPopulation; i++) {
             ArrayList<Double> tempChromosome = new ArrayList<>();
@@ -53,7 +53,8 @@ public class GeneticAlgorithm {
                 tempChromosome.add(randomValue);
             }
 
-            tempChromosome.addAll(Collections.nCopies(3, -999.999)); // Default values for future usage
+            // Default values for future usage
+            tempChromosome.addAll(Collections.nCopies(3, -999.999));
 
             this._population.add(tempChromosome);
         }
@@ -149,7 +150,7 @@ public class GeneticAlgorithm {
         if (this._crossoverOption == GENETIC_CROSSOVER_OPTIONS.SINGLE) {
             this.singlePointCrossover(parent1, parent2, randomGenePosition);
         } else {
-            this.DoublePointCrossover(parent1, parent2, randomGenePosition, secondRandomGenePosition);
+            this.doublePointCrossover(parent1, parent2, randomGenePosition, secondRandomGenePosition);
         }
     }
 
@@ -171,7 +172,7 @@ public class GeneticAlgorithm {
         this._newPopulation.add(child);
     }
 
-    private void DoublePointCrossover(ArrayList<Double> parent1, ArrayList<Double> parent2, int randomGenePosition,
+    private void doublePointCrossover(ArrayList<Double> parent1, ArrayList<Double> parent2, int randomGenePosition,
             int secondRandomGenePosition) {
         ArrayList<Double> child = new ArrayList<>();
         // 0 - randomGenePosition
