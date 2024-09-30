@@ -27,7 +27,7 @@ public class MLP {
         this._weights = new ArrayList<>();
         this._learningRate = MlpConfig.getLearning_rate();
         this._maxEpoches = MlpConfig.getMax_epoches();
-        this._wantToDisplayTrainErrorInEachEpoch = true;
+        this._wantToDisplayTrainErrorInEachEpoch = false;
 
         System.out.println("Count of patterns: " + this._count);
         System.out.println("Dimension: " + this._dimension);
@@ -40,7 +40,7 @@ public class MLP {
         Double max = MlpConfig.getMax_value();
 
         for (int i = 0; i < countOfWeightsDimension; i++) {
-            Double randomValue = min + (max - min) * random.nextDouble();
+            Double randomValue = min + (max - min) * random.nextDouble(); // [min, max]
             this._weights.add(randomValue);
         }
     }

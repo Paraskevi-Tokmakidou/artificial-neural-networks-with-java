@@ -168,8 +168,10 @@ public class Frame extends JFrame {
                     else {
                         MLP mlp = new MLP();
                         Double trainError = mlp.train(false, null);
+                        String formattedTrainError = String.format("%.5f", trainError);
+                        System.out.println("TRAIN ERROR: " + formattedTrainError);
                         Double testError = mlp.getTestError();
-                        String testErrorDisplay = (testError == -1.0) ? "No test dataset" : testError.toString();
+                        String formattedTestError = String.format("%.5f", testError);
                         this.setTextLabel(
                                 "<html>"
                                         + "<h2>"
@@ -180,7 +182,7 @@ public class Frame extends JFrame {
                                         + " Train Error: "
                                         + "</td>"
                                         + "<td>"
-                                        + trainError
+                                        + formattedTrainError
                                         + "<td/>"
                                         + "<tr/>"
                                         + "<tr>"
@@ -188,7 +190,7 @@ public class Frame extends JFrame {
                                         + " Test Error: "
                                         + "</td>"
                                         + "<td>"
-                                        + testErrorDisplay
+                                        + formattedTestError
                                         + "<td/>"
                                         + "<tr/>"
                                         + "</table>"
@@ -203,8 +205,10 @@ public class Frame extends JFrame {
                     else {
                         MLP mlp = new MLP();
                         Double trainError = mlp.train(true, GENETIC_CROSSOVER_OPTIONS.SINGLE);
+                        String formattedTrainError = String.format("%.5f", trainError);
+                        System.out.println("TRAIN ERROR: " + formattedTrainError);
                         Double testError = mlp.getTestError();
-                        String testErrorDisplay = (testError == -1.0) ? "No test dataset" : testError.toString();
+                        String formattedTestError = String.format("%.5f", testError);
                         this.setTextLabel(
                                 "<html>"
                                         + "<h2>"
@@ -215,7 +219,7 @@ public class Frame extends JFrame {
                                         + " Train Error: "
                                         + "</td>"
                                         + "<td>"
-                                        + trainError
+                                        + formattedTrainError
                                         + "<td/>"
                                         + "<tr/>"
                                         + "<tr>"
@@ -223,7 +227,7 @@ public class Frame extends JFrame {
                                         + " Test Error: "
                                         + "</td>"
                                         + "<td>"
-                                        + testErrorDisplay
+                                        + formattedTestError
                                         + "<td/>"
                                         + "<tr/>"
                                         + "</table>"
@@ -238,8 +242,10 @@ public class Frame extends JFrame {
                     else {
                         MLP mlp = new MLP();
                         Double trainError = mlp.train(true, GENETIC_CROSSOVER_OPTIONS.DOUBLE);
+                        String formattedTrainError = String.format("%.5f", trainError);
+                        System.out.println("TRAIN ERROR: " + formattedTrainError);
                         Double testError = mlp.getTestError();
-                        String testErrorDisplay = (testError == -1.0) ? "No test dataset" : testError.toString();
+                        String formattedTestError = String.format("%.5f", testError);
                         this.setTextLabel(
                                 "<html>"
                                         + "<h2>"
@@ -250,7 +256,7 @@ public class Frame extends JFrame {
                                         + " Train Error: "
                                         + "</td>"
                                         + "<td>"
-                                        + trainError
+                                        + formattedTrainError
                                         + "<td/>"
                                         + "<tr/>"
                                         + "<tr>"
@@ -258,7 +264,7 @@ public class Frame extends JFrame {
                                         + " Test Error: "
                                         + "</td>"
                                         + "<td>"
-                                        + testErrorDisplay
+                                        + formattedTestError
                                         + "<td/>"
                                         + "<tr/>"
                                         + "</table>"

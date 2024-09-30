@@ -35,7 +35,7 @@ public class GeneticAlgorithm {
                 .round(this._countOfPopulation * this._elitismRatio);
         this._countGenesOfChromosome = dimension;
         this._population = new ArrayList<>();
-        this._wantToDisplayTrainErrorInEachEpoch = true;
+        this._wantToDisplayTrainErrorInEachEpoch = false;
         this._crossoverOption = geneticCrossoverOption;
         mlp = new MLP();
     }
@@ -49,7 +49,7 @@ public class GeneticAlgorithm {
         for (int i = 0; i < this._countOfPopulation; i++) {
             ArrayList<Double> tempChromosome = new ArrayList<>();
             for (int j = 0; j < this._countGenesOfChromosome; j++) {
-                Double randomValue = min + (max - min) * this.random.nextDouble();
+                Double randomValue = min + (max - min) * this.random.nextDouble(); // [min, max]
                 tempChromosome.add(randomValue);
             }
 

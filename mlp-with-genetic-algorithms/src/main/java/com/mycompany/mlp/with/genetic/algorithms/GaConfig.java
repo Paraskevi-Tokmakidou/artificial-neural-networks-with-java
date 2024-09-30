@@ -6,9 +6,9 @@ package com.mycompany.mlp.with.genetic.algorithms;
  */
 
 public class GaConfig {
-    private static int count_of_population = 500;
+    private static int count_of_population = 300;
     private static int max_epoches = 100;
-    private static Double crossoverRatio = 0.95; // 95%
+    private static Double crossoverRatio = 0.94; // 94%
     private static Double elitismRatio = 0.04; // 4%
     private static Double mutatioRatio = 0.02; // 2%
     private static Double min_value = 0.0;
